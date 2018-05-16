@@ -1,25 +1,9 @@
 import { Map } from 'immutable';
 import { inspect } from 'util';
-const board = Map();
+import { readSync } from 'fs';
 
-// const newBoard = board
-//   .setIn([1, 1], '')
-//   .setIn([1, 2], '')
-//   .setIn([1, 3], '')
-//   .setIn([2, 1], '')
-//   .setIn([2, 2], '')
-//   .setIn([2, 3], '')
-//   .setIn([3, 1], '')
-//   .setIn([3, 2], '')
-//   .setIn([3, 3], '').setIn([3,4],'')
-
-// const turnKeeper = (iteration) => {
-//   if(itteration % 2) return 'X'
-//   else return 'O'
-// }
 
 export const move = (player, coordinate) => {
-  inspect(board);
   return {
     type: 'MOVE',
     player: player,
@@ -28,45 +12,66 @@ export const move = (player, coordinate) => {
 };
 
 function winner(board) {
-  for (let i = 0; i < 3; i++) {
-    if (
-      board.getIn([i, i]) === board.getIn([i + 1, i + 1]) &&
-      board.getIn([i, i]) === board.getIn([i + 2, i + 2])
-    ) {
-      return board.getIn([i, i]);
-    } else if (
-      board.getIn([i, i + 2]) === board.getIn([i + 1, i + 1]) &&
-      board.getIn([i, i + 2]) === board.getIn([i, i + 2])
-    ) {
-      return board.getIn([i, i]);
-    }
-    for (let j = 0; j < 3; j++) {
-      if (
-        board.getIn([i, j]) === board.getIn([i, j + 1]) &&
-        board.getIn([i, j]) === board.getIn([i, j + 2])
-      ) {
-        return board.getIn([i, j]);
-      } else if (
-        board.getIn([i, j]) === board.getIn([i + 1, j]) &&
-        board.getIn([i, j]) === board.getIn([i + 2, j])
-      ) {
-        return board.getIn([i, j]);
-      }
-    }
-  }
-  return null;
+  if(board.getIn([0,0]) === board.getIn([0,1]) && board.getIn([0,0]) === board.getIn([0,2])) return board.getIn(0,0)
+  if(board.getIn([1,0]) === board.getIn([1,1]) && board.getIn([1,0]) === board.getIn([1,2])) return board.getIn(1,0)
+  if(board.getIn([2,0]) === board.getIn([2,1]) && board.getIn([2,0]) === board.getIn([2,2])) return board.getIn(2,0)
+  if(board.getIn([0,0]) === board.getIn([1,0]) && board.getIn([0,0]) === board.getIn([2,0])) return board.getIn(0,0)
+  if(board.getIn([0,1]) === board.getIn([1,1]) && board.getIn([0,1]) === board.getIn([2,1])) return board.getIn(0,1)
+  if(board.getIn([0,2]) === board.getIn([1,2]) && board.getIn([0,2]) === board.getIn([2,2])) return board.getIn(0,2)
+  if(board.getIn([0,0]) === board.getIn([1,1]) && board.getIn([0,0]) === board.getIn([2,2])) return board.getIn(0,1)
+  if(board.getIn([0,2]) === board.getIn([1,1]) && board.getIn([2,0]) === board.getIn([1,1])) return board.getIn(0,2)
 }
 
-export default function(state = { turn: 'X', board: board }, action) {
+// function winner(board) {
+//   for (let i = 0; i < 3; i++) {
+//     if (
+//       board.getIn([i, i]) === board.getIn([i + 1, i + 1]) &&
+//       board.getIn([i, i]) === board.getIn([i + 2, i + 2])
+//     ) {
+//       return board.getIn([i, i]);
+//     } else if (
+//       board.getIn([i, i + 2]) === board.getIn([i + 1, i + 1]) &&
+//       board.getIn([i, i + 2]) === board.getIn([i, i + 2])
+//     ) {
+//       return board.getIn([i, i]);
+//     }
+//     for (let j = 0; j < 3; j++) {
+//       if (
+//         board.getIn([i, j]) === board.getIn([i, j + 1]) &&
+//         board.getIn([i, j]) === board.getIn([i, j + 2])
+//       ) {
+//         return board.getIn([i, j]);
+//       } else if (
+//         board.getIn([i, j]) === board.getIn([i + 1, j]) &&
+//         board.getIn([i, j]) === board.getIn([i + 2, j])
+//       ) {
+//         return board.getIn([i, j]);
+//       }
+//     }
+//   }
+//   return null;
+// }
+
+const boardReducer = function(board = Map(), action) {
   switch (action.type) {
     case 'MOVE': {
-      const newBoard = state.board.setIn(action.position, action.player);
-      const newplayer = action.player === 'X' ? 'O' : 'X';
-      console.log(state.board.Map);
-      return { turn: newplayer, board: newBoard };
+      const newBoard = board.setIn(action.position, action.player);
+      return newBoard
     }
     default: {
-      return state;
+      return board;
     }
   }
 }
+
+const turnReducer = function(turn = 'X',action) {
+  return action.player === 'X' ? 'O' : 'X';
+}
+
+export default function(state={}, action)  {
+  return {
+    board: boardReducer(state.board, action),
+    turn: turnReducer(state.turn, action)
+    }
+  }
+
