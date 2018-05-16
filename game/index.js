@@ -2,7 +2,6 @@ import { Map } from 'immutable';
 import { inspect } from 'util';
 import { readSync } from 'fs';
 
-
 export const move = (player, coordinate) => {
   return {
     type: 'MOVE',
@@ -12,14 +11,54 @@ export const move = (player, coordinate) => {
 };
 
 function winner(board) {
-  if(board.getIn([0,0]) === board.getIn([0,1]) && board.getIn([0,0]) === board.getIn([0,2])) return board.getIn(0,0)
-  if(board.getIn([1,0]) === board.getIn([1,1]) && board.getIn([1,0]) === board.getIn([1,2])) return board.getIn(1,0)
-  if(board.getIn([2,0]) === board.getIn([2,1]) && board.getIn([2,0]) === board.getIn([2,2])) return board.getIn(2,0)
-  if(board.getIn([0,0]) === board.getIn([1,0]) && board.getIn([0,0]) === board.getIn([2,0])) return board.getIn(0,0)
-  if(board.getIn([0,1]) === board.getIn([1,1]) && board.getIn([0,1]) === board.getIn([2,1])) return board.getIn(0,1)
-  if(board.getIn([0,2]) === board.getIn([1,2]) && board.getIn([0,2]) === board.getIn([2,2])) return board.getIn(0,2)
-  if(board.getIn([0,0]) === board.getIn([1,1]) && board.getIn([0,0]) === board.getIn([2,2])) return board.getIn(0,1)
-  if(board.getIn([0,2]) === board.getIn([1,1]) && board.getIn([2,0]) === board.getIn([1,1])) return board.getIn(0,2)
+  if (
+    board.getIn([0, 0]) === board.getIn([0, 1]) &&
+    board.getIn([0, 0]) === board.getIn([0, 2])
+  ) {
+    return board.getIn(0, 0);
+  }
+  if (
+    board.getIn([1, 0]) === board.getIn([1, 1]) &&
+    board.getIn([1, 0]) === board.getIn([1, 2])
+  ) {
+    return board.getIn(1, 0);
+  }
+  if (
+    board.getIn([2, 0]) === board.getIn([2, 1]) &&
+    board.getIn([2, 0]) === board.getIn([2, 2])
+  ) {
+    return board.getIn(2, 0);
+  }
+  if (
+    board.getIn([0, 0]) === board.getIn([1, 0]) &&
+    board.getIn([0, 0]) === board.getIn([2, 0])
+  ) {
+    return board.getIn(0, 0);
+  }
+  if (
+    board.getIn([0, 1]) === board.getIn([1, 1]) &&
+    board.getIn([0, 1]) === board.getIn([2, 1])
+  ) {
+    return board.getIn(0, 1);
+  }
+  if (
+    board.getIn([0, 2]) === board.getIn([1, 2]) &&
+    board.getIn([0, 2]) === board.getIn([2, 2])
+  ) {
+    return board.getIn(0, 2);
+  }
+  if (
+    board.getIn([0, 0]) === board.getIn([1, 1]) &&
+    board.getIn([0, 0]) === board.getIn([2, 2])
+  ) {
+    return board.getIn(0, 1);
+  }
+  if (
+    board.getIn([0, 2]) === board.getIn([1, 1]) &&
+    board.getIn([2, 0]) === board.getIn([1, 1])
+  ) {
+    return board.getIn(0, 2);
+  }
 }
 
 // function winner(board) {
@@ -56,22 +95,23 @@ const boardReducer = function(board = Map(), action) {
   switch (action.type) {
     case 'MOVE': {
       const newBoard = board.setIn(action.position, action.player);
-      return newBoard
+      return newBoard;
     }
     default: {
       return board;
     }
   }
-}
+};
 
-const turnReducer = function(turn = 'X',action) {
+const turnReducer = function(turn = 'X', action) {
   return action.player === 'X' ? 'O' : 'X';
-}
+};
 
-export default function(state={}, action)  {
+export default function(state = {}, action) {
+  const wintext = winner(boardReducer(state.board, action));
+  console.log(wintext);
   return {
     board: boardReducer(state.board, action),
-    turn: turnReducer(state.turn, action)
-    }
-  }
-
+    turn: turnReducer(state.turn, action),
+  };
+}
